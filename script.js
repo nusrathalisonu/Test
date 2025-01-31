@@ -3,12 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const tradeTable = document.getElementById('tradeTable').getElementsByTagName('tbody')[0];
   let trades = [];
 
-  // Convert symbol to uppercase as the user types
-  const symbolInput = document.getElementById('symbol');
-  symbolInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.toUpperCase();
-  });
-
   tradeForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -95,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const typeCell = row.insertCell(9);
-      typeCell.textContent = trade.type === 'buy' ? 'Long' : 'Short';
+      typeCell.textContent = trade.type;
 
       const actionsCell = row.insertCell(10);
       const editButton = document.createElement('button');
