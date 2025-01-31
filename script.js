@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const typeCell = row.insertCell(9);
-      typeCell.textContent = trade.type;
+      typeCell.textContent = trade.type === 'buy' ? 'Long' : 'Short';
 
       const actionsCell = row.insertCell(10);
       const editButton = document.createElement('button');
