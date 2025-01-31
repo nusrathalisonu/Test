@@ -23,29 +23,23 @@
               <label for="symbol" class="block text-sm font-medium text-gray-700">Symbol</label>
               <input type="text" id="symbol" name="symbol" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
             </div>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-2 gap-4">
               <div>
                 <label for="date" class="block text-sm font-medium text-gray-700">Entry Date</label>
                 <input type="date" id="date" name="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                <label for="exitDate" class="block text-sm font-medium text-gray-700 mt-4">Exit Date</label>
+                <input type="date" id="exitDate" name="exitDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
               </div>
               <div>
                 <label for="entryPrice" class="block text-sm font-medium text-gray-700">Entry Price</label>
                 <input type="number" step="0.01" id="entryPrice" name="entryPrice" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-              </div>
-              <div>
-                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
-                <input type="number" id="quantity" name="quantity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-              </div>
-            </div>
-            <div class="grid grid-cols-3 gap-4">
-              <div>
-                <label for="exitDate" class="block text-sm font-medium text-gray-700">Exit Date</label>
-                <input type="date" id="exitDate" name="exitDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-              </div>
-              <div>
-                <label for="exitPrice" class="block text-sm font-medium text-gray-700">Exit Price</label>
+                <label for="exitPrice" class="block text-sm font-medium text-gray-700 mt-4">Exit Price</label>
                 <input type="number" step="0.01" id="exitPrice" name="exitPrice" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
               </div>
+            </div>
+            <div>
+              <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+              <input type="number" id="quantity" name="quantity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
             </div>
             <div class="col-span-2">
               <label class="block text-sm font-medium text-gray-700">Trade Type</label>
