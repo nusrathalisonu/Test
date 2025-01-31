@@ -1,13 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tradeForm = document.getElementById('tradeForm');
   const tradeTable = document.getElementById('tradeTable').getElementsByTagName('tbody')[0];
-  let trades = [];
+  let trades = JSON.parse(localStorage.getItem('trades')) || [];
 
   // Convert symbol to uppercase as the user types
   const symbolInput = document.getElementById('symbol');
   symbolInput.addEventListener('input', (e) => {
     e.target.value = e.target.value.toUpperCase();
   });
+
+  // Load trades from localStorage on page load
+  renderTrades();
 
   tradeForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -37,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     trades.push(newTrade);
+    saveTrades();
     renderTrades();
     tradeForm.reset();
   });
@@ -141,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         trades.push(updatedTrade);
+        saveTrades();
         renderTrades();
         tradeForm.reset();
       }, { once: true });
@@ -149,6 +154,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function deleteTrade(id) {
     trades = trades.filter(trade => trade.id !== id);
+    saveTrades();
     renderTrades();
+  }
+
+  function saveTrades() {
+    localStorage.setItem('trades', JSON.stringify(trades));
   }
 });
