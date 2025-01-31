@@ -1,78 +1,105 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tradeForm = document.getElementById('tradeForm');
-  const tradeTableBody = document.getElementById('tradeTable').getElementsByTagName('tbody')[0];
+  const tradeTable = document.getElementById('tradeTable').getElementsByTagName('tbody')[0];
   let trades = [];
 
   tradeForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const formData = new FormData(tradeForm);
-    const trade = {
-      date: formData.get('date'),
-      symbol: formData.get('symbol'),
-      quantity: formData.get('quantity'),
-      entryPrice: formData.get('entryPrice'),
-      exitPrice: formData.get('exitPrice'),
-      exitDate: formData.get('exitDate'),
-      type: formData.get('type'),
+    const symbol = document.getElementById('symbol').value.trim();
+    const date = document.getElementById('date').value.trim();
+    const entryPrice = document.getElementById('entryPrice').value.trim();
+    const exitDate = document.getElementById('exitDate').value.trim();
+    const exitPrice = document.getElementById('exitPrice').value.trim();
+    const quantity = document.getElementById('quantity').value.trim();
+    const type = document.querySelector('input[name="type"]:checked').value;
+
+    if (!symbol || !date || !entryPrice) {
+      alert('Please enter Symbol, Entry Date, and Entry Price.');
+      return;
+    }
+
+    const newTrade = {
       id: Date.now(),
+      symbol,
+      date,
+      entryPrice: parseFloat(entryPrice),
+      exitDate,
+      exitPrice: exitPrice ? parseFloat(exitPrice) : null,
+      quantity: parseInt(quantity, 10),
+      type,
     };
 
-    trades.push(trade);
+    trades.push(newTrade);
     renderTrades();
     tradeForm.reset();
   });
 
   function renderTrades() {
-    tradeTableBody.innerHTML = '';
-
+    tradeTable.innerHTML = '';
     trades.forEach(trade => {
-      const row = tradeTableBody.insertRow();
+      const row = tradeTable.insertRow();
 
-      const entryDateCell = row.insertCell();
+      const entryDateCell = row.insertCell(0);
       entryDateCell.textContent = trade.date;
 
-      const symbolCell = row.insertCell();
+      const symbolCell = row.insertCell(1);
       symbolCell.textContent = trade.symbol;
 
-      const statusCell = row.insertCell();
-      const { profitLossPrice, profitLossPercentage } = calculateProfitLoss(trade.entryPrice, trade.exitPrice, trade.quantity);
-      const status = calculateStatus(trade.exitPrice, profitLossPrice);
+      const statusCell = row.insertCell(2);
+      const status = trade.exitDate ? 'Closed' : 'Open';
       statusCell.textContent = status;
-      statusCell.className = status === 'Win' ? 'text-green-500' : status === 'Loss' ? 'text-red-500' : 'text-gray-500';
+      statusCell.className = status === 'Closed' ? 'text-green-500' : 'text-gray-500';
 
-      const quantityCell = row.insertCell();
+      const quantityCell = row.insertCell(3);
       quantityCell.textContent = trade.quantity;
 
-      const entryPriceCell = row.insertCell();
-      entryPriceCell.textContent = `$${parseFloat(trade.entryPrice).toFixed(2)}`;
+      const entryPriceCell = row.insertCell(4);
+      entryPriceCell.textContent = `$${trade.entryPrice.toFixed(2)}`;
 
-      const exitPriceCell = row.insertCell();
-      exitPriceCell.textContent = trade.exitPrice ? `$${parseFloat(trade.exitPrice).toFixed(2)}` : '-';
+      const exitPriceCell = row.insertCell(5);
+      exitPriceCell.textContent = trade.exitPrice ? `$${trade.exitPrice.toFixed(2)}` : '-';
 
-      const daysHeldCell = row.insertCell();
-      daysHeldCell.textContent = calculateDaysHeld(trade.date, trade.exitDate);
+      const daysHeldCell = row.insertCell(6);
+      if (trade.exitDate) {
+        const entry = new Date(trade.date);
+        const exit = new Date(trade.exitDate);
+        const daysHeld = (exit - entry) / (1000 * 60 * 60 * 24);
+        daysHeldCell.textContent = daysHeld;
+      } else {
+        daysHeldCell.textContent = '-';
+      }
 
-      const profitLossPriceCell = row.insertCell();
-      profitLossPriceCell.textContent = `$${profitLossPrice.toFixed(2)}`;
-      profitLossPriceCell.className = profitLossPrice >= 0 ? 'text-green-500' : 'text-red-500';
+      const profitLossPriceCell = row.insertCell(7);
+      if (trade.exitPrice) {
+        const profitLossPrice = (trade.exitPrice - trade.entryPrice) * trade.quantity;
+        profitLossPriceCell.textContent = `$${profitLossPrice.toFixed(2)}`;
+        profitLossPriceCell.className = profitLossPrice >= 0 ? 'text-green-500' : 'text-red-500';
+      } else {
+        profitLossPriceCell.textContent = '-';
+      }
 
-      const profitLossPercentageCell = row.insertCell();
-      profitLossPercentageCell.textContent = `${profitLossPercentage.toFixed(2)}%`;
-      profitLossPercentageCell.className = profitLossPercentage >= 0 ? 'text-green-500' : 'text-red-500';
+      const profitLossPercentCell = row.insertCell(8);
+      if (trade.exitPrice) {
+        const profitLossPercent = ((trade.exitPrice - trade.entryPrice) / trade.entryPrice) * 100;
+        profitLossPercentCell.textContent = `${profitLossPercent.toFixed(2)}%`;
+        profitLossPercentCell.className = profitLossPercent >= 0 ? 'text-green-500' : 'text-red-500';
+      } else {
+        profitLossPercentCell.textContent = '-';
+      }
 
-      const typeCell = row.insertCell();
+      const typeCell = row.insertCell(9);
       typeCell.textContent = trade.type;
 
-      const actionsCell = row.insertCell();
+      const actionsCell = row.insertCell(10);
       const editButton = document.createElement('button');
-      editButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2';
-      editButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 12"></polygon></svg>';
-      editButton.addEventListener('click', () => editTrade(trade));
+      editButton.textContent = 'Edit';
+      editButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2';
+      editButton.addEventListener('click', () => editTrade(trade.id));
 
       const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Delete';
       deleteButton.className = 'inline-flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500';
-      deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
       deleteButton.addEventListener('click', () => deleteTrade(trade.id));
 
       actionsCell.appendChild(editButton);
@@ -80,32 +107,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function calculateDaysHeld(entryDate, exitDate) {
-    const entry = new Date(entryDate);
-    const exit = exitDate ? new Date(exitDate) : new Date();
-    const timeDifference = exit - entry;
-    const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
-    return dayDifference;
-  }
+  function editTrade(id) {
+    const trade = trades.find(trade => trade.id === id);
+    if (trade) {
+      document.getElementById('symbol').value = trade.symbol;
+      document.getElementById('date').value = trade.date;
+      document.getElementById('entryPrice').value = trade.entryPrice;
+      document.getElementById('exitDate').value = trade.exitDate || '';
+      document.getElementById('exitPrice').value = trade.exitPrice || '';
+      document.getElementById('quantity').value = trade.quantity;
+      document.querySelector(`input[name="type"][value="${trade.type}"]`).checked = true;
 
-  function calculateProfitLoss(entryPrice, exitPrice, quantity) {
-    if (!exitPrice) return { profitLossPrice: 0, profitLossPercentage: 0 };
-    const entryPriceNum = parseFloat(entryPrice);
-    const exitPriceNum = parseFloat(exitPrice);
-    const quantityNum = parseFloat(quantity);
-    const profitLossPrice = (exitPriceNum - entryPriceNum) * quantityNum;
-    const profitLossPercentage = ((exitPriceNum - entryPriceNum) / entryPriceNum) * 100;
-    return { profitLossPrice, profitLossPercentage };
-  }
+      const tradeIndex = trades.indexOf(trade);
+      trades.splice(tradeIndex, 1);
 
-  function calculateStatus(exitPrice, profitLossPrice) {
-    if (!exitPrice) return 'Open';
-    return profitLossPrice > 0 ? 'Win' : 'Loss';
-  }
+      tradeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const updatedTrade = {
+          id: trade.id,
+          symbol: document.getElementById('symbol').value.trim(),
+          date: document.getElementById('date').value.trim(),
+          entryPrice: parseFloat(document.getElementById('entryPrice').value.trim()),
+          exitDate: document.getElementById('exitDate').value.trim(),
+          exitPrice: document.getElementById('exitPrice').value.trim() ? parseFloat(document.getElementById('exitPrice').value.trim()) : null,
+          quantity: parseInt(document.getElementById('quantity').value.trim(), 10),
+          type: document.querySelector('input[name="type"]:checked').value,
+        };
 
-  function editTrade(trade) {
-    // Implement edit functionality here
-    alert('Edit trade functionality not implemented yet.');
+        trades.push(updatedTrade);
+        renderTrades();
+        tradeForm.reset();
+      }, { once: true });
+    }
   }
 
   function deleteTrade(id) {
